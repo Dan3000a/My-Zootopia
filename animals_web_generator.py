@@ -8,47 +8,50 @@ def load_data(file_path):
         return json.load(handle)
 
 
-# Load JSON data
-animals_data = load_data('animals_data.json')
-
-def generate_animal_html():
-    """Generates the HTML for the animals list."""
-    output = ''  # Initialize an empty string to hold the serialized HTML
-    for animal_data in animals_data:
-        # Start a new list item
-        output += '<li class="cards__item">\n'
-
-        # Add animal title (name)
-        if "name" in animal_data:
-            output += f'  <div class="card__title">{html.escape(animal_data["name"])}</div>\n'
-
-        # Add animal details in a paragraph
-        output += '  <p class="card__text">\n'
-        if "characteristics" in animal_data and "diet" in animal_data["characteristics"]:
-            output += f'      <strong>Diet:</strong> {html.escape(animal_data["characteristics"]["diet"])}<br/>\n'
-        if "locations" in animal_data and len(animal_data["locations"]) > 0:
-            locations = " and ".join(map(html.escape, animal_data["locations"]))
-            output += f'      <strong>Location:</strong> {locations}<br/>\n'
-        if "characteristics" in animal_data and "type" in animal_data["characteristics"]:
-            output += f'      <strong>Type:</strong> {html.escape(animal_data["characteristics"]["type"])}<br/>\n'
-        output += '  </p>\n'
-
-        # End the list item
-        output += '</li>\n'
-
+def serialize_animal(animal_obj):
+    """Serializes a single animal object into an HTML list item."""
+    output = ''
+    output += '<li class="cards__item">\n'
+    if "name" in animal_obj:
+        output += f'  <div class="card__title">{html.escape(animal_obj["name"])}</div>\n'
+    output += '  <p class="card__text">\n'
+    if "characteristics" in animal_obj and "diet" in animal_obj["characteristics"]:
+        output += f'      <strong>Diet:</strong> {html.escape(animal_obj["characteristics"]["diet"])}<br/>\n'
+    if "locations" in animal_obj and len(animal_obj["locations"]) > 0:
+        locations = " and ".join(map(html.escape, animal_obj["locations"]))
+        output += f'      <strong>Location:</strong> {locations}<br/>\n'
+    if "characteristics" in animal_obj and "type" in animal_obj["characteristics"]:
+        output += f'      <strong>Type:</strong> {html.escape(animal_obj["characteristics"]["type"])}<br/>\n'
+    output += '  </p>\n'
+    output += '</li>\n'
     return output
 
 
-# Generate the animals output
-animals_html = generate_animal_html()
+def generate_animal_html(animals_data):
+    """Generates the HTML for all animals by using the serialize_animal function."""
+    output = ''
+    for animal_obj in animals_data:
+        output += serialize_animal(animal_obj)  # Call the function for each animal
+    return output
 
-# Replace placeholder and write to file
-with open("animals_template.html", "r") as file:
+
+# Load JSON data
+animals_data = load_data('animals_data.json')
+
+# Generate the animals output
+animals_html = generate_animal_html(animals_data)
+
+# Read the HTML template
+template_file_path = "animals_template.html"
+with open(template_file_path, "r") as file:
     html_template = file.read()
 
+# Replace placeholder in the template with the generated animal HTML
 html_output = html_template.replace("__REPLACE_ANIMALS_INFO__", animals_html)
 
-with open("animals.html", "w") as file:
+# Write the final HTML to a new file
+output_file_path = "animals.html"
+with open(output_file_path, "w") as file:
     file.write(html_output)
 
-print("HTML file 'animals.html' generated successfully!")
+print(f"HTML file '{output_file_path}' generated successfully!")
