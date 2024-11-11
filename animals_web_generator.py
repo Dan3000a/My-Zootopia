@@ -8,7 +8,7 @@ def load_data(file_path):
         return json.load(handle)
 
 
-# Load JSON data before defining the function
+# Load JSON data
 animals_data = load_data('animals_data.json')
 
 def generate_animal_html():
@@ -18,21 +18,20 @@ def generate_animal_html():
         # Start a new list item
         output += '<li class="cards__item">\n'
 
-        # Add animal name if it exists
+        # Add animal title (name)
         if "name" in animal_data:
-            output += f"Name: {html.escape(animal_data['name'])}<br/>\n"
+            output += f'  <div class="card__title">{html.escape(animal_data["name"])}</div>\n'
 
-        # Add diet information if it exists
+        # Add animal details in a paragraph
+        output += '  <p class="card__text">\n'
         if "characteristics" in animal_data and "diet" in animal_data["characteristics"]:
-            output += f"Diet: {html.escape(animal_data['characteristics']['diet'])}<br/>\n"
-
-        # Add location information if it exists
+            output += f'      <strong>Diet:</strong> {html.escape(animal_data["characteristics"]["diet"])}<br/>\n'
         if "locations" in animal_data and len(animal_data["locations"]) > 0:
-            output += f"Location: {html.escape(animal_data['locations'][0])}<br/>\n"
-
-        # Add type information if it exists
+            locations = " and ".join(map(html.escape, animal_data["locations"]))
+            output += f'      <strong>Location:</strong> {locations}<br/>\n'
         if "characteristics" in animal_data and "type" in animal_data["characteristics"]:
-            output += f"Type: {html.escape(animal_data['characteristics']['type'])}<br/>\n"
+            output += f'      <strong>Type:</strong> {html.escape(animal_data["characteristics"]["type"])}<br/>\n'
+        output += '  </p>\n'
 
         # End the list item
         output += '</li>\n'
