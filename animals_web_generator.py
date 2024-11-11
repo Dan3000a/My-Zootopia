@@ -1,51 +1,55 @@
 import json
+import html
 
 
 def load_data(file_path):
-    """ Loads a JSON file """
+    """Loads a JSON file."""
     with open(file_path, "r") as handle:
         return json.load(handle)
 
 
+# Load JSON data before defining the function
 animals_data = load_data('animals_data.json')
-"""original code:
-for animal in animals_data:
-    if "name" in animal:
-        print(animal["name"])
-    if "characteristics" in animal and "diet" in animal["characteristics"]:
-        print(animal["characteristics"]["diet"])
-    if "locations" in animal and len(animal["locations"]) > 0:  # Making sure "locations" is a list with entries
-        print(animal["locations"][0])
-    if "characteristics" in animal and "type" in animal["characteristics"]:
-        print(animal["characteristics"]["type"])
-    print("\n")
-"""
 
-# Step 1: Read the HTML template
-template_file_path = "animals_template.html"
-with open(template_file_path, "r") as file:
+def generate_animal_html():
+    """Generates the HTML for the animals list."""
+    output = ''  # Initialize an empty string to hold the serialized HTML
+    for animal_data in animals_data:
+        # Start a new list item
+        output += '<li class="cards__item">\n'
+
+        # Add animal name if it exists
+        if "name" in animal_data:
+            output += f"Name: {html.escape(animal_data['name'])}<br/>\n"
+
+        # Add diet information if it exists
+        if "characteristics" in animal_data and "diet" in animal_data["characteristics"]:
+            output += f"Diet: {html.escape(animal_data['characteristics']['diet'])}<br/>\n"
+
+        # Add location information if it exists
+        if "locations" in animal_data and len(animal_data["locations"]) > 0:
+            output += f"Location: {html.escape(animal_data['locations'][0])}<br/>\n"
+
+        # Add type information if it exists
+        if "characteristics" in animal_data and "type" in animal_data["characteristics"]:
+            output += f"Type: {html.escape(animal_data['characteristics']['type'])}<br/>\n"
+
+        # End the list item
+        output += '</li>\n'
+
+    return output
+
+
+# Generate the animals output
+animals_html = generate_animal_html()
+
+# Replace placeholder and write to file
+with open("animals_template.html", "r") as file:
     html_template = file.read()
 
-# Step 2: Generate the animals output (from your previous step)
-output = ""  # Example output generation
-for animal in animals_data:
-    if "name" in animal:
-        output += f"Name: {animal['name']}\n"
-    if "characteristics" in animal and "diet" in animal["characteristics"]:
-        output += f"Diet: {animal['characteristics']['diet']}\n"
-    if "locations" in animal and len(animal["locations"]) > 0:
-        output += f"Location: {animal['locations'][0]}\n"
-    if "characteristics" in animal and "type" in animal["characteristics"]:
-        output += f"Type: {animal['characteristics']['type']}\n"
-    output += "\n"
+html_output = html_template.replace("__REPLACE_ANIMALS_INFO__", animals_html)
 
-# Step 3: Replace the placeholder in the template
-html_output = html_template.replace("__REPLACE_ANIMALS_INFO__", output)
-
-# Step 4: Write the final HTML to a new file
-output_file_path = "animals.html"
-
-with open(output_file_path, "w") as file:
+with open("animals.html", "w") as file:
     file.write(html_output)
 
-print(f"HTML file '{output_file_path}' generated successfully!")
+print("HTML file 'animals.html' generated successfully!")
