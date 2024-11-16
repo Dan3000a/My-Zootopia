@@ -35,23 +35,29 @@ def generate_animal_html(animals_data):
     return output
 
 
-# Load JSON data
-animals_data = load_data('animals_data.json')
+def main():
+    """Main function to orchestrate loading data, generating HTML, and saving the file."""
+    # Load JSON data
+    animals_data = load_data('animals_data.json')
 
-# Generate the animals output
-animals_html = generate_animal_html(animals_data)
+    # Generate the animals output
+    animals_html = generate_animal_html(animals_data)
 
-# Read the HTML template
-template_file_path = "animals_template.html"
-with open(template_file_path, "r") as file:
-    html_template = file.read()
+    # Read the HTML template
+    template_file_path = "animals_template.html"
+    with open(template_file_path, "r") as file:
+        html_template = file.read()
 
-# Replace placeholder in the template with the generated animal HTML
-html_output = html_template.replace("__REPLACE_ANIMALS_INFO__", animals_html)
+    # Replace placeholder in the template with the generated animal HTML
+    html_output = html_template.replace("__REPLACE_ANIMALS_INFO__", animals_html)
 
-# Write the final HTML to a new file
-output_file_path = "animals.html"
-with open(output_file_path, "w") as file:
-    file.write(html_output)
+    # Write the final HTML to a new file
+    output_file_path = "animals.html"
+    with open(output_file_path, "w") as file:
+        file.write(html_output)
 
-print(f"HTML file '{output_file_path}' generated successfully!")
+    print(f"HTML file '{output_file_path}' generated successfully!")
+
+
+if __name__ == "__main__":
+    main()
