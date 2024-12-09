@@ -1,9 +1,12 @@
-import json
 import html
 import requests
+import os
+from dotenv import load_dotenv
+
+load_dotenv()
 
 # API Configuration
-API_KEY = 'a312bo7hWS7TUQoJISE5dA==mvvvsok4VubOjBki'
+API_KEY = os.getenv('API_KEY')
 BASE_URL = 'https://api.api-ninjas.com/v1/animals'
 HEADERS = {'X-Api-Key': API_KEY}
 
@@ -16,9 +19,9 @@ def load_data(animal_name):
         parsed_result = response.json()
         print(f"Successfully fetched data for '{animal_name}': {len(parsed_result)} animals found.")
         return parsed_result
-    else:
-        print(f"Error with the request: {response.status_code}, Message: {response.text}")
-        return []
+
+    print(f"Error with the request: {response.status_code}, Message: {response.text}")
+    return []
 
 
 def serialize_animal(animal_obj):
@@ -41,15 +44,24 @@ def serialize_animal(animal_obj):
 
 def generate_animal_html(animals_data):
     """Generates the HTML output for all animals."""
-    output = ''
-    for animal_obj in animals_data:
-        output += serialize_animal(animal_obj)
-    return output
+    return ''.join(serialize_animal(animal) for animal in animals_data)
+
+
+def read_html_template(file_path):
+    """Reads an HTML template file."""
+    with open(file_path, "r", encoding="utf8") as file:
+        return file.read()
+
+
+def write_html_file(output_path, content):
+    """Writes content to an HTML file."""
+    with open(output_path, "w", encoding="utf8") as file:
+        file.write(content)
+    print(f"HTML file '{output_path}' generated successfully!")
 
 
 def main():
     """Main function to orchestrate the API call, generate HTML, and save the file."""
-    # Fetch data from the API
     user_input = input('What animal are you looking for? ')
     animals_data = load_data(user_input.strip())
 
@@ -62,18 +74,14 @@ def main():
 
     # Read the template file
     template_file_path = "animals_template.html"
-    with open(template_file_path, "r") as file:
-        html_template = file.read()
+    html_template = read_html_template(template_file_path)
 
     # Replace the placeholder with generated animal HTML
     html_output = html_template.replace("__REPLACE_ANIMALS_INFO__", animals_html)
 
     # Save the generated HTML file
     output_file_path = "animals.html"
-    with open(output_file_path, "w") as file:
-        file.write(html_output)
-
-    print(f"HTML file '{output_file_path}' generated successfully!")
+    write_html_file(output_file_path, html_output)
 
 
 if __name__ == "__main__":
